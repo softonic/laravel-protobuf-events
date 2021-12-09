@@ -1,12 +1,12 @@
 {
-  "name": "softonic/<PACKAGE-ID>",
+  "name": "softonic/laravel-protobuf-events",
   "type": "library",
-  "description" : "<DESCRIPTION>",
+  "description" : "Helper to allow nuwber/rabbitevents to work with protobuf",
   "keywords": [],
   "license": "Apache-2.0",
-  "homepage": "https://github.com/softonic/<PACKAGE-ID>",
+  "homepage": "https://github.com/softonic/laravel-protobuf-events",
   "support": {
-    "issues": "https://github.com/softonic/<PACKAGE-ID>/issues"
+    "issues": "https://github.com/softonic/laravel-protobuf-events/issues"
   },
   "require": {
     "php": ">=8.0"
@@ -20,12 +20,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Softonic\\<NAMESPACE>\\": "src/"
+      "Softonic\\LaravelProtobufEvents\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Softonic\\<NAMESPACE>\\": "tests/"
+      "Softonic\\LaravelProtobufEvents\\": "tests/"
     }
   },
   "scripts": {

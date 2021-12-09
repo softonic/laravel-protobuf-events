@@ -12,7 +12,7 @@
          stopOnFailure="false">
 
     <testsuites>
-        <testsuite name="<PACKAGE-NAME>">
+        <testsuite name="Laravel Protobuf Events">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
