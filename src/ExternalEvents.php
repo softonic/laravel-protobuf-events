@@ -5,9 +5,9 @@ namespace Softonic\LaravelProtobufEvents;
 use BadMethodCallException;
 use Exception;
 use Google\Protobuf\Internal\Message;
-use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use ReflectionException;
 use ReflectionParameter;
+use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 
 class ExternalEvents
 {

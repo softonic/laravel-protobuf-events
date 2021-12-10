@@ -3,13 +3,13 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use function PHPUnit\Framework\assertSame;
 use PHPUnit\Framework\TestCase;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
-use function PHPUnit\Framework\assertSame;
-use function PHPUnit\Framework\assertTrue;
 
-function publish($routingKey, $message) {
+function publish($routingKey, $message)
+{
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
     assertSame(['data' => "\n	:content:"], $message);
 }
@@ -58,8 +58,10 @@ class ExternalEventsTest extends TestCase
      */
     public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
     {
-        $invalidListener = new class {
-            public function process(){}
+        $invalidListener = new class() {
+            public function process()
+            {
+            }
         };
         $class = $invalidListener::class;
 
@@ -76,8 +78,9 @@ class ExternalEventsTest extends TestCase
      */
     public function whenDecoratingAListenerItShouldExecuteIt(): void
     {
-        $listener = new class {
-            public function handle(FakeMessage $message){
+        $listener = new class() {
+            public function handle(FakeMessage $message)
+            {
                 assertSame(':content:', $message->getContent());
             }
         };
