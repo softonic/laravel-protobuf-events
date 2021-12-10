@@ -27,10 +27,14 @@ jobs:
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
-      run: composer install --prefer-dist --no-progress && composer run-script test
       with:
         php-version: '8.0'
-        coverage: xdebug2
-        extensions: xdebug3, pcntl, bcmath, protobuf
+        extensions: pcntl, bcmath, protobuf
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
       env:
         COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
+    - name: Run test suite
+      run: composer run-script test
