@@ -25,7 +25,7 @@ class ExternalEventsTest extends TestCase
         $message->setContent(':content:');
         $codedMessage = $message->serializeToString();
 
-        $decodedMessage = ExternalEvents::decodeMessage(FakeMessage::class, $codedMessage);
+        $decodedMessage = ExternalEvents::decode(FakeMessage::class, $codedMessage);
         self::assertSame(':content:', $decodedMessage->getContent());
     }
 
@@ -37,7 +37,7 @@ class ExternalEventsTest extends TestCase
         $this->expectException(InvalidMessageException::class);
         $this->expectErrorMessage('The message is not a valid ' . FakeMessage::class . ' message');
 
-        $decodedMessage = ExternalEvents::decodeMessage(FakeMessage::class, ':invalid-message:');
+        $decodedMessage = ExternalEvents::decode(FakeMessage::class, ':invalid-message:');
 
         self::assertSame(':content:', $decodedMessage->getContent());
     }

@@ -36,7 +36,7 @@ class ExternalEvents
     /**
      * @throws InvalidMessageException
      */
-    public static function decodeMessage(string $expectedEvent, string $message): mixed
+    public static function decode(string $expectedEvent, string $message): mixed
     {
         try {
             $event = new $expectedEvent();
@@ -57,7 +57,7 @@ class ExternalEvents
                 $eventParameter = new ReflectionParameter([$class, 'handle'], 0);
                 $className      = $eventParameter->getType()->getName();
 
-                $event = ExternalEvents::decodeMessage($className, $message['data']);
+                $event = ExternalEvents::decode($className, $message['data']);
                 (new $class())->handle($event);
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
