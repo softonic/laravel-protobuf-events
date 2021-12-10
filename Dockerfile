@@ -5,5 +5,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN install-php-extensions \
     protobuf \
     bcmath \
-    pcntl
+    pcntl \
+    sockets
 

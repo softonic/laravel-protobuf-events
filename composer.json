@@ -19,7 +19,9 @@
     "google/protobuf": "^3.19",
     "ext-protobuf": "*",
     "ext-pcntl": "*",
-    "ext-bcmath": "*"
+    "ext-bcmath": "*",
+    "ext-sockets": "*",
+    "nuwber/rabbitevents": "dev-feature/Allow-closure-listeners"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
