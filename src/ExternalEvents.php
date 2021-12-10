@@ -4,10 +4,10 @@ namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
 use Google\Protobuf\Internal\Message;
-use ReflectionException;
-use ReflectionParameter;
-
 use function publish;
+use ReflectionException;
+
+use ReflectionParameter;
 
 class ExternalEvents
 {
