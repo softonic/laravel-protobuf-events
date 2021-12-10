@@ -3,14 +3,16 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use Exception;
 use Google\Protobuf\Internal\Message;
-use function publish;
+use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use ReflectionException;
-
 use ReflectionParameter;
 
 class ExternalEvents
 {
+    private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
+
     public static function publish(Message $class): void
     {
         $routingKey = str_replace(
@@ -18,7 +20,7 @@ class ExternalEvents
             '.',
             strtolower(
                 preg_replace(
-                    '#(?!(?<=^)|(?<=\\\))[A-Z]#',
+                    self::CAMEL_CASE_LETTERS_DETECTION,
                     '_$0',
                     $class::class
                 )
@@ -31,12 +33,21 @@ class ExternalEvents
         publish($routingKey, $message);
     }
 
+    /**
+     * @throws InvalidMessageException
+     */
     public static function decodeMessage(string $expectedEvent, string $message): mixed
     {
-        $event = new $expectedEvent();
-        $event->mergeFromString($message);
+        try {
+            $event = new $expectedEvent();
+            $event->mergeFromString($message);
 
-        return $event;
+            return $event;
+        } catch (Exception) {
+            throw new InvalidMessageException(
+                "The message is not a valid {$expectedEvent} message"
+            );
+        }
     }
 
     public static function decorateListener(string $class): \Closure

@@ -37,7 +37,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Softonic\\LaravelProtobufEvents\\": "tests/"
+      "Softonic\\LaravelProtobufEvents\\": "tests/",
+      "GPBMetadata\\": "tests/GPBMetadata/"
     }
   },
   "scripts": {
