@@ -23,7 +23,7 @@ class ExternalEventsTest extends TestCase
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
-        $codedMessage = $message->serializeToString();
+        $codedMessage = $message->serializeToJsonString();
 
         $decodedMessage = ExternalEvents::decode(FakeMessage::class, $codedMessage);
         self::assertSame(':content:', $decodedMessage->getContent());
@@ -89,6 +89,6 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        ExternalEvents::decorateListener($listener::class)(['data' => $message->serializeToString()]);
+        ExternalEvents::decorateListener($listener::class)(['data' => $message->serializeToJsonString()]);
     }
 }
