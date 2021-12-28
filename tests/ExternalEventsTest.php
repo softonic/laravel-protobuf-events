@@ -11,7 +11,7 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
-    assertSame(['data' => '***"content":":content:"***'], $message);
+    assertSame(['data' => '{"content":":content:"}'], $message);
 }
 
 class ExternalEventsTest extends TestCase
