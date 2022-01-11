@@ -27,7 +27,7 @@ class ExternalEvents
             )
         );
         $message    = [
-            'data' => $class->serializeToString(),
+            'data' => $class->serializeToJsonString(),
         ];
 
         publish($routingKey, $message);
@@ -40,7 +40,7 @@ class ExternalEvents
     {
         try {
             $event = new $expectedEvent();
-            $event->mergeFromString($message);
+            $event->mergeFromJsonString($message);
 
             return $event;
         } catch (Exception) {

@@ -11,7 +11,7 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
-    assertSame(['data' => "\n	:content:"], $message);
+    assertSame(['data' => '{"content":":content:"}'], $message);
 }
 
 class ExternalEventsTest extends TestCase
@@ -23,7 +23,7 @@ class ExternalEventsTest extends TestCase
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
-        $codedMessage = $message->serializeToString();
+        $codedMessage = $message->serializeToJsonString();
 
         $decodedMessage = ExternalEvents::decode(FakeMessage::class, $codedMessage);
         self::assertSame(':content:', $decodedMessage->getContent());
@@ -89,6 +89,6 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        ExternalEvents::decorateListener($listener::class)(['data' => $message->serializeToString()]);
+        ExternalEvents::decorateListener($listener::class)(['data' => $message->serializeToJsonString()]);
     }
 }
