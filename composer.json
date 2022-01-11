@@ -21,7 +21,7 @@
     "ext-pcntl": "*",
     "ext-bcmath": "*",
     "ext-sockets": "*",
-    "nuwber/rabbitevents": "dev-feature/Allow-closure-listeners"
+    "nuwber/rabbitevents": "dev-master#350564f4024fa57e9f19ddbd157e1e7c0f83b26b"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
