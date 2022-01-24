@@ -5,7 +5,6 @@ namespace Softonic\LaravelProtobufEvents;
 use BadMethodCallException;
 use Exception;
 use Google\Protobuf\Internal\Message;
-use Illuminate\Events\Dispatcher;
 use ReflectionException;
 use ReflectionParameter;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
