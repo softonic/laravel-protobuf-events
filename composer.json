@@ -10,7 +10,7 @@
   },
   "repositories": [
     {
-      "type": "vcs",
+      "type": "git",
       "url": "https://github.com/softonic/rabbitevents.git"
     }
   ],
@@ -21,7 +21,7 @@
     "ext-pcntl": "*",
     "ext-bcmath": "*",
     "ext-sockets": "*",
-    "nuwber/rabbitevents": "dev-master#350564f4024fa57e9f19ddbd157e1e7c0f83b26b"
+    "nuwber/rabbitevents": "^6.0.6-rc1"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
