@@ -3,8 +3,8 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use Orchestra\Testbench\TestCase;
 use function PHPUnit\Framework\assertSame;
-use PHPUnit\Framework\TestCase;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
@@ -70,7 +70,7 @@ class ExternalEventsTest extends TestCase
             "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
         );
 
-        ExternalEvents::decorateListener($invalidListener::class)([]);
+        ExternalEvents::decorateListener($invalidListener::class)(':event:', []);
     }
 
     /**
@@ -84,11 +84,10 @@ class ExternalEventsTest extends TestCase
                 assertSame(':content:', $message->getContent());
             }
         };
-        $class    = $listener::class;
 
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        ExternalEvents::decorateListener($listener::class)(['data' => $message->serializeToJsonString()]);
+        ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
     }
 }

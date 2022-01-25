@@ -50,18 +50,19 @@ class ExternalEvents
         }
     }
 
-    public static function decorateListener(string $class): \Closure
+    public static function decorateListener(string $listenerClass): \Closure
     {
-        return static function (string $event, array $message) use ($class) {
+        return static function (string $event, array $message) use ($listenerClass) {
             try {
-                $eventParameter = new ReflectionParameter([$class, 'handle'], 0);
+                $eventParameter = new ReflectionParameter([$listenerClass, 'handle'], 0);
                 $className      = $eventParameter->getType()->getName();
 
-                $event = ExternalEvents::decode($className, $message[0]['data']);
-                resolve($class)->handle($event);
+                $payload = ExternalEvents::decode($className, $message[0]['data']);
+
+                return resolve($listenerClass)->handle($payload);
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
-                    "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
+                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
                 );
             }
         };
