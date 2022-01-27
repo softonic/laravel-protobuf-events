@@ -8,12 +8,6 @@
   "support": {
     "issues": "https://github.com/softonic/laravel-protobuf-events/issues"
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/softonic/rabbitevents.git"
-    }
-  ],
   "require": {
     "php": ">=8.0",
     "google/protobuf": "^3.19",
@@ -21,7 +15,7 @@
     "ext-pcntl": "*",
     "ext-bcmath": "*",
     "ext-sockets": "*",
-    "nuwber/rabbitevents": "^6.0.6-rc1"
+    "nuwber/rabbitevents": "^6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
