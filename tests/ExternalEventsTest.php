@@ -11,25 +11,20 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
-    assertSame(
-        [
-            'data'         => '{"content":":content:"}',
-            'xRequestId'   => '7b15d663-8d55-4e2f-82cc-4473576a4a17',
-            'xMsgPriority' => 5,
-        ],
-        $message
-    );
+
+    if (array_key_exists('headers', $message)) {
+        $expectedMessage = [
+            'data'    => '{"content":":content:"}',
+            'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+        ];
+    } else {
+        $expectedMessage = ['data' => '{"content":":content:"}'];
+    }
+    assertSame($expectedMessage, $message);
 }
 
 class ExternalEventsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        unset($_SERVER['HTTP_X_REQUEST_ID'], $_SERVER['HTTP_X_MSG_PRIORITY']);
-
-        parent::tearDown();
-    }
-
     /**
      * @test
      */
@@ -62,13 +57,23 @@ class ExternalEventsTest extends TestCase
      */
     public function whenPublishMessageItShouldPublishIt(): void
     {
-        $_SERVER['HTTP_X_REQUEST_ID']   = '7b15d663-8d55-4e2f-82cc-4473576a4a17';
-        $_SERVER['HTTP_X_MSG_PRIORITY'] = 5;
-
         $message = new FakeMessage();
         $message->setContent(':content:');
 
         ExternalEvents::publish($message);
+    }
+
+    /**
+     * @test
+     */
+    public function whenPublishMessageWithHeadersItShouldPublishIt(): void
+    {
+        $headers = ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'];
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        ExternalEvents::publish($message, $headers);
     }
 
     /**
@@ -106,18 +111,37 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
+        ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithHeadersItShouldExecuteIt(): void
+    {
+        $listener = new class() {
+            public function setHeaders(array $headers)
+            {
+                assertSame(['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'], $headers);
+            }
+
+            public function handle(FakeMessage $message)
+            {
+                assertSame(':content:', $message->getContent());
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
         ExternalEvents::decorateListener($listener::class)(
             ':event:',
             [
                 [
-                    'data'         => $message->serializeToJsonString(),
-                    'xRequestId'   => '7b15d663-8d55-4e2f-82cc-4473576a4a17',
-                    'xMsgPriority' => 5,
+                    'data'    => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
             ]
         );
-
-        self::assertSame('7b15d663-8d55-4e2f-82cc-4473576a4a17', $_SERVER['HTTP_X_REQUEST_ID']);
-        self::assertSame(5, $_SERVER['HTTP_X_MSG_PRIORITY']);
     }
 }
