@@ -12,13 +12,16 @@ function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
 
-    if (array_key_exists('headers', $message)) {
+    if (empty($message['headers'])) {
+        $expectedMessage = [
+            'data'    => '{"content":":content:"}',
+            'headers' => [],
+        ];
+    } else {
         $expectedMessage = [
             'data'    => '{"content":":content:"}',
             'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
         ];
-    } else {
-        $expectedMessage = ['data' => '{"content":":content:"}'];
     }
     assertSame($expectedMessage, $message);
 }
@@ -55,7 +58,7 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
-    public function whenPublishMessageItShouldPublishIt(): void
+    public function whenPublishMessageWithoutHeadersItShouldPublishIt(): void
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
@@ -99,7 +102,7 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
-    public function whenDecoratingAListenerItShouldExecuteIt(): void
+    public function whenDecoratingAListenerWithoutHeadersItShouldExecuteIt(): void
     {
         $listener = new class() {
             public function handle(FakeMessage $message)

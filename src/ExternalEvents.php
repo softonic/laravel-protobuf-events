@@ -28,12 +28,9 @@ class ExternalEvents
         );
 
         $message = [
-            'data' => $class->serializeToJsonString(),
+            'data'    => $class->serializeToJsonString(),
+            'headers' => $headers,
         ];
-
-        if ($headers) {
-            $message['headers'] = $headers;
-        }
 
         publish($routingKey, $message);
     }
