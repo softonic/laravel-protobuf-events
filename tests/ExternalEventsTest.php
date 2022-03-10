@@ -4,9 +4,9 @@ namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
 use Orchestra\Testbench\TestCase;
+use function PHPUnit\Framework\assertSame;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
-use function PHPUnit\Framework\assertSame;
 
 function publish($routingKey, $message)
 {
