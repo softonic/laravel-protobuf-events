@@ -4,18 +4,32 @@ namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
 use Orchestra\Testbench\TestCase;
-use function PHPUnit\Framework\assertSame;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
+use function PHPUnit\Framework\assertSame;
 
 function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
-    assertSame(['data' => '{"content":":content:"}'], $message);
+    assertSame(
+        [
+            'data'         => '{"content":":content:"}',
+            'xRequestId'   => '7b15d663-8d55-4e2f-82cc-4473576a4a17',
+            'xMsgPriority' => 5,
+        ],
+        $message
+    );
 }
 
 class ExternalEventsTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        unset($_SERVER['HTTP_X_REQUEST_ID'], $_SERVER['HTTP_X_MSG_PRIORITY']);
+
+        parent::tearDown();
+    }
+
     /**
      * @test
      */
@@ -26,6 +40,7 @@ class ExternalEventsTest extends TestCase
         $codedMessage = $message->serializeToJsonString();
 
         $decodedMessage = ExternalEvents::decode(FakeMessage::class, $codedMessage);
+
         self::assertSame(':content:', $decodedMessage->getContent());
     }
 
@@ -47,6 +62,9 @@ class ExternalEventsTest extends TestCase
      */
     public function whenPublishMessageItShouldPublishIt(): void
     {
+        $_SERVER['HTTP_X_REQUEST_ID']   = '7b15d663-8d55-4e2f-82cc-4473576a4a17';
+        $_SERVER['HTTP_X_MSG_PRIORITY'] = 5;
+
         $message = new FakeMessage();
         $message->setContent(':content:');
 
@@ -63,7 +81,7 @@ class ExternalEventsTest extends TestCase
             {
             }
         };
-        $class = $invalidListener::class;
+        $class           = $invalidListener::class;
 
         $this->expectException(BadMethodCallException::class);
         $this->expectErrorMessage(
@@ -88,6 +106,18 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'data'         => $message->serializeToJsonString(),
+                    'xRequestId'   => '7b15d663-8d55-4e2f-82cc-4473576a4a17',
+                    'xMsgPriority' => 5,
+                ],
+            ]
+        );
+
+        self::assertSame('7b15d663-8d55-4e2f-82cc-4473576a4a17', $_SERVER['HTTP_X_REQUEST_ID']);
+        self::assertSame(5, $_SERVER['HTTP_X_MSG_PRIORITY']);
     }
 }
