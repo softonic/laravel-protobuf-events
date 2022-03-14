@@ -11,7 +11,19 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 function publish($routingKey, $message)
 {
     assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
-    assertSame(['data' => '{"content":":content:"}'], $message);
+
+    if (empty($message['headers'])) {
+        $expectedMessage = [
+            'data'    => '{"content":":content:"}',
+            'headers' => [],
+        ];
+    } else {
+        $expectedMessage = [
+            'data'    => '{"content":":content:"}',
+            'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+        ];
+    }
+    assertSame($expectedMessage, $message);
 }
 
 class ExternalEventsTest extends TestCase
@@ -26,6 +38,7 @@ class ExternalEventsTest extends TestCase
         $codedMessage = $message->serializeToJsonString();
 
         $decodedMessage = ExternalEvents::decode(FakeMessage::class, $codedMessage);
+
         self::assertSame(':content:', $decodedMessage->getContent());
     }
 
@@ -45,12 +58,25 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
-    public function whenPublishMessageItShouldPublishIt(): void
+    public function whenPublishMessageWithoutHeadersItShouldPublishIt(): void
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
 
         ExternalEvents::publish($message);
+    }
+
+    /**
+     * @test
+     */
+    public function whenPublishMessageWithHeadersItShouldPublishIt(): void
+    {
+        $headers = ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'];
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        ExternalEvents::publish($message, $headers);
     }
 
     /**
@@ -63,7 +89,7 @@ class ExternalEventsTest extends TestCase
             {
             }
         };
-        $class = $invalidListener::class;
+        $class           = $invalidListener::class;
 
         $this->expectException(BadMethodCallException::class);
         $this->expectErrorMessage(
@@ -76,7 +102,7 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
-    public function whenDecoratingAListenerItShouldExecuteIt(): void
+    public function whenDecoratingAListenerWithoutHeadersItShouldExecuteIt(): void
     {
         $listener = new class() {
             public function handle(FakeMessage $message)
@@ -89,5 +115,36 @@ class ExternalEventsTest extends TestCase
         $message->setContent(':content:');
 
         ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithHeadersItShouldExecuteIt(): void
+    {
+        $listener = new class() {
+            public function setHeaders(array $headers)
+            {
+                assertSame(['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'], $headers);
+            }
+
+            public function handle(FakeMessage $message)
+            {
+                assertSame(':content:', $message->getContent());
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'data'    => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+            ]
+        );
     }
 }
