@@ -41,7 +41,7 @@ class ExternalEvents
             try {
                 $listener = resolve($listenerClass);
 
-                if (method_exists($listener, 'setHeaders')) {
+                if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {
                     $listener->setHeaders($message[0]['headers']);
                 }
 

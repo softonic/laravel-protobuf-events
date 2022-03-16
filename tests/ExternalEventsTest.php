@@ -5,6 +5,7 @@ namespace Softonic\LaravelProtobufEvents;
 use BadMethodCallException;
 use Orchestra\Testbench\TestCase;
 use function PHPUnit\Framework\assertSame;
+use function PHPUnit\Framework\assertTrue;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
@@ -115,6 +116,36 @@ class ExternalEventsTest extends TestCase
         $message->setContent(':content:');
 
         ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithSetHeadersMethodButWithoutSendingHeadersItShouldExecuteIt(): void
+    {
+        $listener = new class() {
+            public function setHeaders(array $headers)
+            {
+                assertTrue(false, 'setHeaders() should not be executed if no headers are received');
+            }
+
+            public function handle(FakeMessage $message)
+            {
+                assertSame(':content:', $message->getContent());
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'data' => $message->serializeToJsonString(),
+                ],
+            ]
+        );
     }
 
     /**
