@@ -15,7 +15,7 @@
     "ext-pcntl": "*",
     "ext-bcmath": "*",
     "ext-sockets": "*",
-    "nuwber/rabbitevents": "^6.0"
+    "nuwber/rabbitevents": "^7.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
