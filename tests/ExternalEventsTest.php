@@ -11,7 +11,7 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
 function publish($routingKey, $message)
 {
-    assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
+    assertSame(':service:.softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
 
     if (empty($message['headers'])) {
         $expectedMessage = [
@@ -63,8 +63,9 @@ class ExternalEventsTest extends TestCase
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
+        $service = ':service:';
 
-        ExternalEvents::publish($message);
+        ExternalEvents::publish($service, $message);
     }
 
     /**
@@ -76,8 +77,9 @@ class ExternalEventsTest extends TestCase
 
         $message = new FakeMessage();
         $message->setContent(':content:');
+        $service = ':service:';
 
-        ExternalEvents::publish($message, $headers);
+        ExternalEvents::publish($service, $message, $headers);
     }
 
     /**

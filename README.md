@@ -63,6 +63,7 @@ class MyListener
 To publish a message, you need to use the ExternalEvents::publish method.
 ```php
 ExternalEvents::publish(
+    ':service:',
     (new ProtobufExampleMessage)
         ->setName('My name')
         ->setAge(10)
