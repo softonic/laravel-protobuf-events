@@ -47,10 +47,14 @@ In the RabbitEventsServiceProvider::boot register the listeners that you want us
     }
 ```
 
-The listener needs a method called handle that will receive the message and the routing key.
+The listener needs a method called handle that will receive the message and the routing key, and a method called setClient to identify the origin of the message.
 ```php
 class MyListener
 {
+    public function setClient(string $client): void
+    {
+        // ...
+    }
     public function handle(ProtobufExampleMessage $event): void
     {
         // ...
@@ -66,7 +70,8 @@ ExternalEvents::publish(
     ':service:',
     (new ProtobufExampleMessage)
         ->setName('My name')
-        ->setAge(10)
+        ->setAge(10),
+    ':client:'
 );
 ```
 
