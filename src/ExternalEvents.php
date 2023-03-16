@@ -3,8 +3,8 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
-use Exception;
 use Error;
+use Exception;
 use Google\Protobuf\Internal\Message;
 use ReflectionException;
 use ReflectionParameter;
@@ -60,7 +60,7 @@ class ExternalEvents
                 throw new BadMethodCallException(
                     "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
                 );
-            } catch (Error $e){
+            } catch (Error $e) {
                 throw new BadMethodCallException(
                     "$listenerClass must have a setClient method with a single parameter of type string"
                 );

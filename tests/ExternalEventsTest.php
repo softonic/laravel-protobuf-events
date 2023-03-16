@@ -194,7 +194,7 @@ class ExternalEventsTest extends TestCase
                 [
                     'client' => ':client:',
                     'data' => $message->serializeToJsonString(),
-                ]
+                ],
             ]
         );
     }
