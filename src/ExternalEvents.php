@@ -4,6 +4,7 @@ namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
 use Exception;
+use Error;
 use Google\Protobuf\Internal\Message;
 use ReflectionException;
 use ReflectionParameter;
@@ -13,7 +14,7 @@ class ExternalEvents
 {
     private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
 
-    public static function publish(string $service, Message $class, array $headers = []): void
+    public static function publish(string $service, Message $class, string $client, array $headers = []): void
     {
         $routingKey = str_replace(
             '\\',
@@ -30,6 +31,7 @@ class ExternalEvents
         $routingKey = $service . '.' . $routingKey;
 
         $message = [
+            'client'  => $client,
             'data'    => $class->serializeToJsonString(),
             'headers' => $headers,
         ];
@@ -43,6 +45,7 @@ class ExternalEvents
             try {
                 $listener = resolve($listenerClass);
 
+                $listener->setClient($message[0]['client']);
                 if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {
                     $listener->setHeaders($message[0]['headers']);
                 }
@@ -56,6 +59,10 @@ class ExternalEvents
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
                     "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
+                );
+            } catch (Error $e){
+                throw new BadMethodCallException(
+                    "$listenerClass must have a setClient method with a single parameter of type string"
                 );
             }
         };
