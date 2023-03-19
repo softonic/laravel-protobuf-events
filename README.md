@@ -23,10 +23,18 @@ You can require the last version of the package using composer
 composer require softonic/laravel-protobuf-events
 ```
 
+After install the package you must publish all the dependent files
+```bash
+php artisan vendor:publish
+```
+
 ### Configuration
 
 First you need to configure the [nuwber/rabbit-events package](https://github.com/nuwber/rabbitevents) to be able
 to use the package.
+
+Then You must configure ``config/protobuf-events.php`` to set the client of the library. This client allow to isolate 
+different services, identifying the origin of the message.
 
 #### Configuring a listener
 
@@ -70,8 +78,7 @@ ExternalEvents::publish(
     ':service:',
     (new ProtobufExampleMessage)
         ->setName('My name')
-        ->setAge(10),
-    ':client:'
+        ->setAge(10)
 );
 ```
 
