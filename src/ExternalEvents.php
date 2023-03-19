@@ -3,7 +3,6 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
-use Error;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use ReflectionException;
