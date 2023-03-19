@@ -32,6 +32,16 @@ function publish($routingKey, $message)
 class ExternalEventsTest extends TestCase
 {
     /**
+     * Setup the test environment.
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('client', ':client:');
+    }
+
+    /**
      * @test
      */
     public function whenDecodeMessageItShouldReturnTheMessageObject(): void
@@ -66,9 +76,8 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
         $service = ':service:';
-        $client = ':client:';
 
-        ExternalEvents::publish($service, $message, $client);
+        ExternalEvents::publish($service, $message);
     }
 
     /**
@@ -81,9 +90,8 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
         $service = ':service:';
-        $client = ':client:';
 
-        ExternalEvents::publish($service, $message, $client, $headers);
+        ExternalEvents::publish($service, $message, $headers);
     }
 
     /**

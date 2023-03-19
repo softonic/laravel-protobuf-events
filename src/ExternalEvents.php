@@ -13,7 +13,7 @@ class ExternalEvents
 {
     private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
 
-    public static function publish(string $service, Message $class, string $client, array $headers = []): void
+    public static function publish(string $service, Message $class, array $headers = []): void
     {
         $routingKey = str_replace(
             '\\',
@@ -30,7 +30,7 @@ class ExternalEvents
         $routingKey = $service . '.' . $routingKey;
 
         $message = [
-            'client'  => $client,
+            'client'  => config('client'),
             'data'    => $class->serializeToJsonString(),
             'headers' => $headers,
         ];
