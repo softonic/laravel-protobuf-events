@@ -96,7 +96,11 @@ class ExternalEventsTest extends TestCase
             {
             }
         };
+        $class           = $invalidListener::class;
         $this->expectException(BadMethodCallException::class);
+        $this->expectErrorMessage(
+            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
+        );
 
         ExternalEvents::decorateListener($invalidListener::class)(':event:', []);
     }
@@ -116,7 +120,11 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
+        $class           = $listener::class;
         $this->expectException(BadMethodCallException::class);
+        $this->expectErrorMessage(
+            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
+        );
 
         ExternalEvents::decorateListener($listener::class)(
             ':event:',

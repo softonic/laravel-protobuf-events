@@ -45,7 +45,9 @@ class ExternalEvents
             try {
                 $listener = resolve($listenerClass);
 
+                $eventParameter = new ReflectionParameter([$listenerClass, 'setClient'], 0);
                 $listener->setClient($message[0]['client']);
+
                 if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {
                     $listener->setHeaders($message[0]['headers']);
                 }
@@ -58,11 +60,7 @@ class ExternalEvents
                 return $listener->handle($payload);
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
-                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
-                );
-            } catch (Error $e) {
-                throw new BadMethodCallException(
-                    "$listenerClass must have a setClient method with a single parameter of type string"
+                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
                 );
             }
         };
