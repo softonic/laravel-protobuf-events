@@ -23,11 +23,6 @@ You can require the last version of the package using composer
 composer require softonic/laravel-protobuf-events
 ```
 
-After install the package you must publish all the dependent files
-```bash
-php artisan vendor:publish
-```
-
 ### Configuration
 
 First you need to configure the [nuwber/rabbit-events package](https://github.com/nuwber/rabbitevents) to be able

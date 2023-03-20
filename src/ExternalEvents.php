@@ -30,7 +30,7 @@ class ExternalEvents
         $routingKey = $service . '.' . $routingKey;
 
         $message = [
-            'client'  => config('client'),
+            'client'  => config('protobuf-events.client'),
             'data'    => $class->serializeToJsonString(),
             'headers' => $headers,
         ];

@@ -38,7 +38,7 @@ class ExternalEventsTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('client', ':client:');
+        config()->set('protobuf-events.client', ':client:');
     }
 
     /**
