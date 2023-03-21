@@ -36,13 +36,6 @@
       "GPBMetadata\\": "tests/GPBMetadata/"
     }
   },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Softonic\\LaravelProtobufEvents\\ServiceProvider"
-      ]
-    }
-  },
   "scripts": {
     "test": [
       "@checkstyle",
@@ -59,5 +52,12 @@
     ],
     "php-cs-fixer": "php-cs-fixer fix -v --diff --allow-risky=yes",
     "rector": "rector"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Softonic\\LaravelProtobufEvents\\ServiceProvider"
+      ]
+    }
   }
 }
