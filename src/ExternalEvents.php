@@ -44,7 +44,9 @@ class ExternalEvents
             try {
                 $listener = resolve($listenerClass);
 
-                $eventParameter = new ReflectionParameter([$listenerClass, 'setClient'], 0);
+                if (!method_exists($listener, 'setClient')) {
+                    throw new ReflectionException();
+                }
                 $listener->setClient($message[0]['client']);
 
                 if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {

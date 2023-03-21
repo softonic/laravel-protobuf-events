@@ -36,6 +36,13 @@
       "GPBMetadata\\": "tests/GPBMetadata/"
     }
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Softonic\\LaravelProtobufEvents\\ServiceProvider"
+      ]
+    }
+  },
   "scripts": {
     "test": [
       "@checkstyle",
