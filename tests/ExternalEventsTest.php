@@ -97,25 +97,6 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
-    public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
-    {
-        $invalidListener = new class() {
-            public function process()
-            {
-            }
-        };
-        $class           = $invalidListener::class;
-        $this->expectException(BadMethodCallException::class);
-        $this->expectErrorMessage(
-            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
-        );
-
-        ExternalEvents::decorateListener($invalidListener::class)(':event:', []);
-    }
-
-    /**
-     * @test
-     */
     public function whenDecoratingAListenerWithoutClientItShouldThrowAnException(): void
     {
         $listener = new class() {
@@ -131,13 +112,48 @@ class ExternalEventsTest extends TestCase
         $class           = $listener::class;
         $this->expectException(BadMethodCallException::class);
         $this->expectErrorMessage(
-            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
+            "$class must have a setClient method with a single parameter of type string"
         );
 
         ExternalEvents::decorateListener($listener::class)(
             ':event:',
             [
                 [
+                    'data' => $message->serializeToJsonString(),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
+    {
+        $invalidListener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+            public function process()
+            {
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        $class           = $invalidListener::class;
+        $this->expectException(BadMethodCallException::class);
+        $this->expectErrorMessage(
+            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
+        );
+
+        ExternalEvents::decorateListener($invalidListener::class)(
+            ':event:',
+            [
+                [
+                    'client' => ':client:',
                     'data' => $message->serializeToJsonString(),
                 ],
             ]

@@ -3,6 +3,7 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use Error;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use ReflectionException;
@@ -45,7 +46,9 @@ class ExternalEvents
                 $listener = resolve($listenerClass);
 
                 if (!method_exists($listener, 'setClient')) {
-                    throw new ReflectionException();
+                    throw new BadMethodCallException(
+                        "$listenerClass must have a setClient method with a single parameter of type string"
+                    );
                 }
                 $listener->setClient($message[0]['client']);
 
@@ -61,7 +64,7 @@ class ExternalEvents
                 return $listener->handle($payload);
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
-                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message and a setClient method with a single parameter of type string"
+                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
                 );
             }
         };
