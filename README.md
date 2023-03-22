@@ -28,6 +28,9 @@ composer require softonic/laravel-protobuf-events
 First you need to configure the [nuwber/rabbit-events package](https://github.com/nuwber/rabbitevents) to be able
 to use the package.
 
+Then You must configure ``config/protobuf-events.php`` to set the client of the library. This client allow to isolate 
+different services, identifying the origin of the message.
+
 #### Configuring a listener
 
 In the RabbitEventsServiceProvider::boot register the listeners that you want using the ExternalEvents::decorateListener method.
@@ -47,10 +50,14 @@ In the RabbitEventsServiceProvider::boot register the listeners that you want us
     }
 ```
 
-The listener needs a method called handle that will receive the message and the routing key.
+The listener needs a method called handle that will receive the message and the routing key, and a method called setClient to identify the origin of the message.
 ```php
 class MyListener
 {
+    public function setClient(string $client): void
+    {
+        // ...
+    }
     public function handle(ProtobufExampleMessage $event): void
     {
         // ...
@@ -63,6 +70,7 @@ class MyListener
 To publish a message, you need to use the ExternalEvents::publish method.
 ```php
 ExternalEvents::publish(
+    ':service:',
     (new ProtobufExampleMessage)
         ->setName('My name')
         ->setAge(10)

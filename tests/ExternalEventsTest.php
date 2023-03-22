@@ -11,15 +11,17 @@ use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
 function publish($routingKey, $message)
 {
-    assertSame('softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
+    assertSame(':service:.softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
 
     if (empty($message['headers'])) {
         $expectedMessage = [
+            'client'    => ':client:',
             'data'    => '{"content":":content:"}',
             'headers' => [],
         ];
     } else {
         $expectedMessage = [
+            'client'    => ':client:',
             'data'    => '{"content":":content:"}',
             'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
         ];
@@ -29,6 +31,16 @@ function publish($routingKey, $message)
 
 class ExternalEventsTest extends TestCase
 {
+    /**
+     * Setup the test environment.
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('protobuf-events.client', ':client:');
+    }
+
     /**
      * @test
      */
@@ -63,8 +75,9 @@ class ExternalEventsTest extends TestCase
     {
         $message = new FakeMessage();
         $message->setContent(':content:');
+        $service = ':service:';
 
-        ExternalEvents::publish($message);
+        ExternalEvents::publish($service, $message);
     }
 
     /**
@@ -76,34 +89,15 @@ class ExternalEventsTest extends TestCase
 
         $message = new FakeMessage();
         $message->setContent(':content:');
+        $service = ':service:';
 
-        ExternalEvents::publish($message, $headers);
+        ExternalEvents::publish($service, $message, $headers);
     }
 
     /**
      * @test
      */
-    public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
-    {
-        $invalidListener = new class() {
-            public function process()
-            {
-            }
-        };
-        $class           = $invalidListener::class;
-
-        $this->expectException(BadMethodCallException::class);
-        $this->expectErrorMessage(
-            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
-        );
-
-        ExternalEvents::decorateListener($invalidListener::class)(':event:', []);
-    }
-
-    /**
-     * @test
-     */
-    public function whenDecoratingAListenerWithoutHeadersItShouldExecuteIt(): void
+    public function whenDecoratingAListenerWithoutClientItShouldThrowAnException(): void
     {
         $listener = new class() {
             public function handle(FakeMessage $message)
@@ -115,7 +109,85 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        ExternalEvents::decorateListener($listener::class)(':event:', [['data' => $message->serializeToJsonString()]]);
+        $class           = $listener::class;
+        $this->expectException(BadMethodCallException::class);
+        $this->expectErrorMessage(
+            "$class must have a setClient method with a single parameter of type string"
+        );
+
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'data' => $message->serializeToJsonString(),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
+    {
+        $invalidListener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+            public function process()
+            {
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        $class           = $invalidListener::class;
+        $this->expectException(BadMethodCallException::class);
+        $this->expectErrorMessage(
+            "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
+        );
+
+        ExternalEvents::decorateListener($invalidListener::class)(
+            ':event:',
+            [
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithoutHeadersItShouldExecuteIt(): void
+    {
+        $listener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+            public function handle(FakeMessage $message)
+            {
+                assertSame(':content:', $message->getContent());
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
+                ],
+            ]
+        );
     }
 
     /**
@@ -124,6 +196,11 @@ class ExternalEventsTest extends TestCase
     public function whenDecoratingAListenerWithSetHeadersMethodButWithoutSendingHeadersItShouldExecuteIt(): void
     {
         $listener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+
             public function setHeaders(array $headers)
             {
                 assertTrue(false, 'setHeaders() should not be executed if no headers are received');
@@ -142,6 +219,7 @@ class ExternalEventsTest extends TestCase
             ':event:',
             [
                 [
+                    'client' => ':client:',
                     'data' => $message->serializeToJsonString(),
                 ],
             ]
@@ -154,6 +232,11 @@ class ExternalEventsTest extends TestCase
     public function whenDecoratingAListenerWithHeadersItShouldExecuteIt(): void
     {
         $listener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+
             public function setHeaders(array $headers)
             {
                 assertSame(['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'], $headers);
@@ -172,6 +255,7 @@ class ExternalEventsTest extends TestCase
             ':event:',
             [
                 [
+                    'client' => ':client:',
                     'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],

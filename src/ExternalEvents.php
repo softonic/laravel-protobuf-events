@@ -13,7 +13,7 @@ class ExternalEvents
 {
     private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
 
-    public static function publish(Message $class, array $headers = []): void
+    public static function publish(string $service, Message $class, array $headers = []): void
     {
         $routingKey = str_replace(
             '\\',
@@ -27,7 +27,10 @@ class ExternalEvents
             )
         );
 
+        $routingKey = $service . '.' . $routingKey;
+
         $message = [
+            'client'  => config('protobuf-events.client'),
             'data'    => $class->serializeToJsonString(),
             'headers' => $headers,
         ];
@@ -40,6 +43,13 @@ class ExternalEvents
         return static function (string $event, array $message) use ($listenerClass) {
             try {
                 $listener = resolve($listenerClass);
+
+                if (!method_exists($listener, 'setClient')) {
+                    throw new BadMethodCallException(
+                        "$listenerClass must have a setClient method with a single parameter of type string"
+                    );
+                }
+                $listener->setClient($message[0]['client']);
 
                 if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {
                     $listener->setHeaders($message[0]['headers']);
