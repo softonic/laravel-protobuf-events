@@ -6,10 +6,10 @@ use BadMethodCallException;
 use Exception;
 use Mockery;
 use Orchestra\Testbench\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
@@ -121,8 +121,8 @@ class ExternalEventsTest extends TestCase
                 $service,
                 ':service:.softonic.laravel_protobuf_events.fake_proto.fake_message',
                 [
-                    'client' => ':client:',
-                    'data' => '{"content":":content:"}',
+                    'client'  => ':client:',
+                    'data'    => '{"content":":content:"}',
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
                 $this->isType('int'),
@@ -205,7 +205,7 @@ class ExternalEventsTest extends TestCase
             [
                 [
                     'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'data'   => $message->serializeToJsonString(),
                 ],
             ]
         );
@@ -236,7 +236,7 @@ class ExternalEventsTest extends TestCase
             [
                 [
                     'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'data'   => $message->serializeToJsonString(),
                 ],
             ]
         );
@@ -272,7 +272,7 @@ class ExternalEventsTest extends TestCase
             [
                 [
                     'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'data'   => $message->serializeToJsonString(),
                 ],
             ]
         );
@@ -307,8 +307,8 @@ class ExternalEventsTest extends TestCase
             ':event:',
             [
                 [
-                    'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'client'  => ':client:',
+                    'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
             ]
@@ -346,8 +346,8 @@ class ExternalEventsTest extends TestCase
             ->with(
                 ':event:',
                 [
-                    'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'client'  => ':client:',
+                    'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
                 $this->isType('int')
@@ -369,8 +369,8 @@ class ExternalEventsTest extends TestCase
             ':event:',
             [
                 [
-                    'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'client'  => ':client:',
+                    'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
             ]
@@ -408,8 +408,8 @@ class ExternalEventsTest extends TestCase
             ->with(
                 ':event:',
                 [
-                    'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'client'  => ':client:',
+                    'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
                 $this->isType('int')
@@ -434,8 +434,8 @@ class ExternalEventsTest extends TestCase
             ':event:',
             [
                 [
-                    'client' => ':client:',
-                    'data' => $message->serializeToJsonString(),
+                    'client'  => ':client:',
+                    'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
             ]
