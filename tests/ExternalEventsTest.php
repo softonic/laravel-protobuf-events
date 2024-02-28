@@ -3,7 +3,11 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use Exception;
+use Mockery;
 use Orchestra\Testbench\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
@@ -15,13 +19,13 @@ function publish($routingKey, $message)
 
     if (empty($message['headers'])) {
         $expectedMessage = [
-            'client'    => ':client:',
+            'client'  => ':client:',
             'data'    => '{"content":":content:"}',
             'headers' => [],
         ];
     } else {
         $expectedMessage = [
-            'client'    => ':client:',
+            'client'  => ':client:',
             'data'    => '{"content":":content:"}',
             'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
         ];
@@ -31,14 +35,19 @@ function publish($routingKey, $message)
 
 class ExternalEventsTest extends TestCase
 {
-    /**
-     * Setup the test environment.
-     */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         config()->set('protobuf-events.client', ':client:');
+    }
+
+    protected function tearDown(): void
+    {
+        ExternalEvents::$logger = null;
+        ExternalEvents::$formatter = null;
+
+        parent::tearDown();
     }
 
     /**
@@ -61,7 +70,7 @@ class ExternalEventsTest extends TestCase
     public function whenDecodeAnInvalidMessageItShouldThrowAnException(): void
     {
         $this->expectException(InvalidMessageException::class);
-        $this->expectErrorMessage('The message is not a valid ' . FakeMessage::class . ' message');
+        $this->expectExceptionMessage('The message is not a valid ' . FakeMessage::class . ' message');
 
         $decodedMessage = ExternalEvents::decode(FakeMessage::class, ':invalid-message:');
 
@@ -97,6 +106,47 @@ class ExternalEventsTest extends TestCase
     /**
      * @test
      */
+    public function whenPublishMessageWithLoggerAndFormatterItShouldPublishAndLogIt(): void
+    {
+        $headers = ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'];
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+        $service = ':service:';
+
+        $formatter = Mockery::mock(LogMessageFormatterInterface::class);
+        $formatter->shouldReceive('formatOutgoingMessage')
+            ->once()
+            ->with(
+                $service,
+                ':service:.softonic.laravel_protobuf_events.fake_proto.fake_message',
+                [
+                    'client' => ':client:',
+                    'data' => '{"content":":content:"}',
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+                $this->isType('int'),
+                null
+            )
+            ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
+
+        $logger = Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('log')
+            ->once()
+            ->with(
+                LogLevel::INFO,
+                ':message:',
+                ['context' => ':context:']
+            );
+
+        ExternalEvents::setLogger($logger);
+        ExternalEvents::setFormatter($formatter);
+        ExternalEvents::publish($service, $message, $headers);
+    }
+
+    /**
+     * @test
+     */
     public function whenDecoratingAListenerWithoutClientItShouldThrowAnException(): void
     {
         $listener = new class() {
@@ -109,9 +159,9 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        $class           = $listener::class;
+        $class = $listener::class;
         $this->expectException(BadMethodCallException::class);
-        $this->expectErrorMessage(
+        $this->expectExceptionMessage(
             "$class must have a setClient method with a single parameter of type string"
         );
 
@@ -135,6 +185,7 @@ class ExternalEventsTest extends TestCase
             {
                 assertSame(':client:', $client);
             }
+
             public function process()
             {
             }
@@ -143,9 +194,9 @@ class ExternalEventsTest extends TestCase
         $message = new FakeMessage();
         $message->setContent(':content:');
 
-        $class           = $invalidListener::class;
+        $class = $invalidListener::class;
         $this->expectException(BadMethodCallException::class);
-        $this->expectErrorMessage(
+        $this->expectExceptionMessage(
             "$class must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
         );
 
@@ -170,6 +221,7 @@ class ExternalEventsTest extends TestCase
             {
                 assertSame(':client:', $client);
             }
+
             public function handle(FakeMessage $message)
             {
                 assertSame(':content:', $message->getContent());
@@ -256,7 +308,134 @@ class ExternalEventsTest extends TestCase
             [
                 [
                     'client' => ':client:',
-                    'data'    => $message->serializeToJsonString(),
+                    'data' => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithLoggerAndFormatterItShouldExecuteAndLogIt(): void
+    {
+        $listener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+
+            public function setHeaders(array $headers)
+            {
+                assertSame(['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'], $headers);
+            }
+
+            public function handle(FakeMessage $message)
+            {
+                assertSame(':content:', $message->getContent());
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        $formatter = Mockery::mock(LogMessageFormatterInterface::class);
+        $formatter->shouldReceive('formatIncomingMessage')
+            ->once()
+            ->with(
+                ':event:',
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+                $this->isType('int')
+            )
+            ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
+
+        $logger = Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('log')
+            ->once()
+            ->with(
+                LogLevel::INFO,
+                ':message:',
+                ['context' => ':context:']
+            );
+
+        ExternalEvents::setLogger($logger);
+        ExternalEvents::setFormatter($formatter);
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function whenDecoratingAListenerWithLoggerAndFormatterButListenerThrowsAnExceptionItShouldLogItAndThrowTheException(): void
+    {
+        $listener = new class() {
+            public function setClient(string $client)
+            {
+                assertSame(':client:', $client);
+            }
+
+            public function setHeaders(array $headers)
+            {
+                assertSame(['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'], $headers);
+            }
+
+            public function handle(FakeMessage $message)
+            {
+                throw new Exception(':error:');
+            }
+        };
+
+        $message = new FakeMessage();
+        $message->setContent(':content:');
+
+        $formatter = Mockery::mock(LogMessageFormatterInterface::class);
+        $formatter->shouldReceive('formatIncomingMessage')
+            ->once()
+            ->with(
+                ':event:',
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
+                    'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+                ],
+                $this->isType('int')
+            )
+            ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
+
+        $logger = Mockery::mock(LoggerInterface::class);
+        $logger->shouldReceive('log')
+            ->once()
+            ->with(
+                LogLevel::ERROR,
+                ':message:',
+                ['context' => ':context:']
+            );
+
+        self::expectException(Exception::class);
+        self::expectExceptionMessage(':error:');
+
+        ExternalEvents::setLogger($logger);
+        ExternalEvents::setFormatter($formatter);
+        ExternalEvents::decorateListener($listener::class)(
+            ':event:',
+            [
+                [
+                    'client' => ':client:',
+                    'data' => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
             ]

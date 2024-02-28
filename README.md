@@ -28,12 +28,12 @@ composer require softonic/laravel-protobuf-events
 First you need to configure the [nuwber/rabbit-events package](https://github.com/nuwber/rabbitevents) to be able
 to use the package.
 
-Then You must configure ``config/protobuf-events.php`` to set the client of the library. This client allow to isolate 
+Then you must configure `config/protobuf-events.php` to set the client of the library. This client allows to isolate
 different services, identifying the origin of the message.
 
 #### Configuring a listener
 
-In the RabbitEventsServiceProvider::boot register the listeners that you want using the ExternalEvents::decorateListener method.
+In the `RabbitEventsServiceProvider::boot()` register the listeners that you want using the `ExternalEvents::decorateListener()` method.
 ```php
     /**
      * Register any events for your application.
@@ -50,7 +50,8 @@ In the RabbitEventsServiceProvider::boot register the listeners that you want us
     }
 ```
 
-The listener needs a method called handle that will receive the message and the routing key, and a method called setClient to identify the origin of the message.
+The listener needs a method called `handle()` that will receive the message and the routing key,
+and a method called `setClient()` to identify the origin of the message.
 ```php
 class MyListener
 {
@@ -67,7 +68,7 @@ class MyListener
 
 #### Publishing messages
 
-To publish a message, you need to use the ExternalEvents::publish method.
+To publish a message, you need to use the `ExternalEvents::publish()` method.
 ```php
 ExternalEvents::publish(
     ':service:',
@@ -80,14 +81,26 @@ ExternalEvents::publish(
 #### Advanced usage
 
 Sometimes you need to use the package in a different way than the default. For example, you can use the package to decode
-a message from a string. In that case, you are able to decode the message using the ExternalEvents::decode method.
+a message from a string. In that case, you are able to decode the message using the `ExternalEvents::decode()` method.
 
 ```php
 $message = ExternalEvents::decode(
     ProtobufExampleMessage::class,
-    '\n My name\n 10\n' // The message is a string with the protobuf message
+    '\n My name\n 10\n' // The message is a string with the protobuf message.
 );
 ```
+
+### Logging protobuf messages
+
+If you want to log the outgoing protobuf messages and the incoming ones, you can configure a logger and a formatter for the message to be logged.
+For that purpose you have the methods `ExternalEvents::setLogger()` and `ExternalEvents::setFormatter()`.
+The logger must implement the `Psr\Log\LoggerInterface` and the formatter, the `LogMessageFormatterInterface` interface.
+```php
+ExternalEvents::setLogger(Log:getFacadeRoot());
+ExternalEvents::setFormatter(new ProtobufLogMessageFormatter());
+```
+The formatter will have two methods, `formatOutgoingMessage()` and `formatIncomingMessage()`, that will be called when a message is sent or received, respectively.
+Both should return a `LogMessage` object, which contains the message to log and the context.
 
 Testing
 -------
