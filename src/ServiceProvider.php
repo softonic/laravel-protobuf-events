@@ -3,17 +3,14 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Psr\Log\NullLogger;
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    /**
-     * @var string
-     */
     protected string $packageName = 'protobuf-events';
 
     /**
      * Bootstrap the application services.
-     *
      */
     public function boot()
     {
@@ -23,11 +20,14 @@ class ServiceProvider extends LaravelServiceProvider
             ],
             'config'
         );
+
+        if (ExternalEvents::$logger === null) {
+            ExternalEvents::setLogger(new NullLogger());
+        }
     }
 
     /**
      * Register the application services.
-     *
      */
     public function register()
     {

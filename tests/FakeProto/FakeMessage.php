@@ -19,11 +19,10 @@ class FakeMessage extends \Google\Protobuf\Internal\Message
     /**
      * Constructor.
      *
-     * @param array $data {
-     *                    Optional. Data for populating the Message object.
-     *
-     *     @type string $content
-     * }
+     * @param array  $data {
+     *                     Optional. Data for populating the Message object.
+     * @type  string $content
+     *               }
      */
     public function __construct($data = null)
     {
@@ -33,6 +32,7 @@ class FakeMessage extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>string content = 1;</code>
+     *
      * @return string
      */
     public function getContent()
@@ -42,6 +42,7 @@ class FakeMessage extends \Google\Protobuf\Internal\Message
 
     /**
      * Generated from protobuf field <code>string content = 1;</code>
+     *
      * @param  string $var
      * @return $this
      */
