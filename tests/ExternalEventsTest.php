@@ -350,7 +350,8 @@ class ExternalEventsTest extends TestCase
                     'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
-                $this->isType('int')
+                $this->isType('int'),
+                null
             )
             ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
 
@@ -411,8 +412,10 @@ class ExternalEventsTest extends TestCase
                     'client'  => ':client:',
                     'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
+
                 ],
-                $this->isType('int')
+                $this->isType('int'),
+                $this->isInstanceOf(Exception::class)
             )
             ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
 

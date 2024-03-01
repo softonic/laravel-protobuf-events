@@ -15,8 +15,9 @@ interface LogMessageFormatterInterface
     ): LogMessage;
 
     public function formatIncomingMessage(
-        string $routingKey,
-        array  $message,
-        int    $executionTimeMs
+        string     $routingKey,
+        array      $message,
+        int        $executionTimeMs,
+        ?Throwable $exception = null
     ): LogMessage;
 }

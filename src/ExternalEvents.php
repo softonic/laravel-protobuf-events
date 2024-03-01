@@ -123,7 +123,8 @@ class ExternalEvents
                 $logMessage = self::$formatter->formatIncomingMessage(
                     $event,
                     $message[0],
-                    $executionTimeMs
+                    $executionTimeMs,
+                    $exception ?? null
                 );
 
                 self::$logger->log($level, $logMessage->message, $logMessage->context);
