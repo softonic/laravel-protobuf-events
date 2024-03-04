@@ -20,10 +20,6 @@ class ServiceProvider extends LaravelServiceProvider
             ],
             'config'
         );
-
-        if (ExternalEvents::$logger === null) {
-            ExternalEvents::setLogger(new NullLogger());
-        }
     }
 
     /**
@@ -32,5 +28,9 @@ class ServiceProvider extends LaravelServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/' . $this->packageName . '.php', $this->packageName);
+
+        if (ExternalEvents::$logger === null) {
+            ExternalEvents::setLogger(new NullLogger());
+        }
     }
 }

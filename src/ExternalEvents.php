@@ -13,9 +13,9 @@ use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 
 class ExternalEvents
 {
-    public static ?LoggerInterface $logger;
+    public static ?LoggerInterface $logger = null;
 
-    public static ?LogMessageFormatterInterface $formatter;
+    public static ?LogMessageFormatterInterface $formatter = null;
 
     private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
 
