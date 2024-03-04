@@ -1,4 +1,4 @@
-FROM softonic/composer-rector:latest
+FROM composer/composer:2.4.0
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
 
