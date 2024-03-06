@@ -7,7 +7,6 @@ use Throwable;
 interface LogMessageFormatterInterface
 {
     public function formatOutgoingMessage(
-        string     $service,
         string     $routingKey,
         array      $message,
         int        $executionTimeMs,
