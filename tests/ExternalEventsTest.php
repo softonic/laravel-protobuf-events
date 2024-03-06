@@ -118,7 +118,6 @@ class ExternalEventsTest extends TestCase
         $formatter->shouldReceive('formatOutgoingMessage')
             ->once()
             ->with(
-                $service,
                 ':service:.softonic.laravel_protobuf_events.fake_proto.fake_message',
                 [
                     'client'  => ':client:',

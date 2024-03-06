@@ -66,7 +66,6 @@ class ExternalEvents
             $executionTimeMs = ($endTimeMs - $startTimeMs) * 1000;
 
             $logMessage = self::$formatter->formatOutgoingMessage(
-                $service,
                 $routingKey,
                 $message,
                 $executionTimeMs,
