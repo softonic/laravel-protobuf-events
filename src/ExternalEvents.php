@@ -56,7 +56,7 @@ class ExternalEvents
 
             publish($routingKey, $message);
 
-            $level = LogLevel::INFO;
+            $level = config('protobuf-events.communications_log_level');
         } catch (Exception $exception) {
             $level = LogLevel::ERROR;
         }
@@ -106,7 +106,7 @@ class ExternalEvents
 
                 $response = $listener->handle($payload);
 
-                $level = LogLevel::INFO;
+                $level = config('protobuf-events.communications_log_level');
             } catch (ReflectionException $e) {
                 throw new BadMethodCallException(
                     "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"

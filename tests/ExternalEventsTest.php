@@ -40,6 +40,7 @@ class ExternalEventsTest extends TestCase
         parent::setUp();
 
         config()->set('protobuf-events.client', ':client:');
+        config()->set('protobuf-events.communications_log_level', LogLevel::INFO);
     }
 
     protected function tearDown(): void
