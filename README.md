@@ -102,6 +102,8 @@ ExternalEvents::setFormatter(new ProtobufLogMessageFormatter());
 The formatter will have two methods, `formatOutgoingMessage()` and `formatIncomingMessage()`, that will be called when a message is sent or received, respectively.
 Both should return a `LogMessage` object, which contains the message to log and the context.
 
+The log level can be changed by setting the `communications_log_level` key in `config/protobuf-events.php`.
+
 Testing
 -------
 
