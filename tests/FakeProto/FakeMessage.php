@@ -5,11 +5,13 @@
 namespace Softonic\LaravelProtobufEvents\FakeProto;
 
 use Google\Protobuf\Internal\GPBUtil;
+use Google\Protobuf\Internal\Message;
+use GPBMetadata\Fake;
 
 /**
  * Generated from protobuf message <code>Softonic.LaravelProtobufEvents.FakeProto.FakeMessage</code>
  */
-class FakeMessage extends \Google\Protobuf\Internal\Message
+class FakeMessage extends Message
 {
     /**
      * Generated from protobuf field <code>string content = 1;</code>
@@ -26,7 +28,7 @@ class FakeMessage extends \Google\Protobuf\Internal\Message
      */
     public function __construct($data = null)
     {
-        \GPBMetadata\Fake::initOnce();
+        Fake::initOnce();
         parent::__construct($data);
     }
 
@@ -46,7 +48,7 @@ class FakeMessage extends \Google\Protobuf\Internal\Message
      * @param  string $var
      * @return $this
      */
-    public function setContent($var)
+    public function setContent($var): static
     {
         GPBUtil::checkString($var, true);
         $this->content = $var;
