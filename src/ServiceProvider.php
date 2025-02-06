@@ -3,6 +3,8 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Override;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 class ServiceProvider extends LaravelServiceProvider
@@ -12,7 +14,7 @@ class ServiceProvider extends LaravelServiceProvider
     /**
      * Bootstrap the application services.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes(
             [
@@ -25,11 +27,12 @@ class ServiceProvider extends LaravelServiceProvider
     /**
      * Register the application services.
      */
-    public function register()
+    #[Override]
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/' . $this->packageName . '.php', $this->packageName);
 
-        if (ExternalEvents::$logger === null) {
+        if (!ExternalEvents::$logger instanceof LoggerInterface) {
             ExternalEvents::setLogger(new NullLogger());
         }
     }

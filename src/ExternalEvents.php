@@ -3,6 +3,7 @@
 namespace Softonic\LaravelProtobufEvents;
 
 use BadMethodCallException;
+use Closure;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use Psr\Log\LoggerInterface;
@@ -17,7 +18,7 @@ class ExternalEvents
 
     public static ?LogMessageFormatterInterface $formatter = null;
 
-    private const CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
+    private const string CAMEL_CASE_LETTERS_DETECTION = '#(?!(?<=^)|(?<=\\\))[A-Z]#';
 
     public static function setLogger(LoggerInterface $logger): void
     {
@@ -35,7 +36,7 @@ class ExternalEvents
             '\\',
             '.',
             strtolower(
-                preg_replace(
+                (string) preg_replace(
                     self::CAMEL_CASE_LETTERS_DETECTION,
                     '_$0',
                     $class::class
@@ -80,7 +81,7 @@ class ExternalEvents
         }
     }
 
-    public static function decorateListener(string $listenerClass): \Closure
+    public static function decorateListener(string $listenerClass): Closure
     {
         return static function (string $event, array $message) use ($listenerClass) {
             try {
@@ -90,9 +91,10 @@ class ExternalEvents
 
                 if (!method_exists($listener, 'setClient')) {
                     throw new BadMethodCallException(
-                        "$listenerClass must have a setClient method with a single parameter of type string"
+                        "{$listenerClass} must have a setClient method with a single parameter of type string"
                     );
                 }
+
                 $listener->setClient($message[0]['client']);
 
                 if (!empty($message[0]['headers']) && method_exists($listener, 'setHeaders')) {
@@ -107,9 +109,9 @@ class ExternalEvents
                 $response = $listener->handle($payload);
 
                 $level = config('protobuf-events.communications_log_level');
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
                 throw new BadMethodCallException(
-                    "$listenerClass must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
+                    "{$listenerClass} must have a handle method with a single parameter of type object child of \Google\Protobuf\Internal\Message"
                 );
             } catch (Exception $exception) {
                 $level = LogLevel::ERROR;

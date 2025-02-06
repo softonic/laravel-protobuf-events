@@ -1,9 +1,49 @@
 version: '3.8'
 
 services:
-  composer:
-    volumes:
-    - ./:/app
+  php:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+
+  install:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: composer install
+
+  update:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: composer update
+
+  phpunit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: composer phpunit
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: composer run tests
+
+  fix-cs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: composer run fix-cs
