@@ -30,14 +30,6 @@ services:
       - ./:/app
     command: sh -c "git config --global --add safe.directory /app && composer run phpunit"
 
-  test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./:/app
-    command: sh -c "git config --global --add safe.directory /app && composer run tests"
-
   tests:
     build:
       context: .
