@@ -1,11 +1,21 @@
-FROM composer:2.2
+FROM composer:2
 
-RUN apk add --no-cache linux-headers musl-dev autoconf gcc g++ make
+# Install build dependencies
+RUN apk add --no-cache $PHPIZE_DEPS linux-headers musl-dev autoconf gcc g++ make
 
+# Install required PHP extensions
 RUN docker-php-ext-install sockets bcmath pcntl
 
-RUN pecl install protobuf \
-    && docker-php-ext-enable protobuf
+# Install protobuf
+RUN pecl install protobuf && docker-php-ext-enable protobuf
 
-RUN apk del autoconf gcc g++ make
+# Install PCOV for fast code coverage
+RUN pecl install pcov && docker-php-ext-enable pcov
 
+# Configure PCOV
+RUN echo "pcov.enabled=1" >> /usr/local/etc/php/conf.d/docker-php-ext-pcov.ini
+
+# Clean up
+RUN apk del $PHPIZE_DEPS autoconf gcc g++ make
+
+WORKDIR /app

@@ -3,12 +3,17 @@ Laravel Protobuf Events
 
 [![Latest Version](https://img.shields.io/github/release/softonic/laravel-protobuf-events.svg?style=flat-square)](https://github.com/softonic/laravel-protobuf-events/releases)
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://github.com/softonic/laravel-protobuf-events/actions/workflows/php.yml/badge.svg?branch=master)](https://github.com/softonic/laravel-protobuf-events/actions/workflows/php.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/softonic/laravel-protobuf-events/tests.yml?branch=master&style=flat-square)](https://github.com/softonic/laravel-protobuf-events/actions/workflows/tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/softonic/laravel-protobuf-events.svg?style=flat-square)](https://packagist.org/packages/softonic/laravel-protobuf-events)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/softonic/laravel-protobuf-events.svg?style=flat-square)](http://isitmaintained.com/project/softonic/laravel-protobuf-events "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/softonic/laravel-protobuf-events.svg?style=flat-square)](http://isitmaintained.com/project/softonic/laravel-protobuf-events "Percentage of issues still open")
 
 Helper to allow nuwber/rabbitevents to work with protobuf
+
+## Requirements
+
+- PHP >= 8.5
+- Laravel 12.x
 
 Main features
 -------------
@@ -111,13 +116,38 @@ Testing
 
 To run the tests, run the following command from the project folder.
 
-``` bash
-$ make tests
+```bash
+docker compose run --rm test
+```
+
+To run PHPUnit only:
+
+```bash
+docker compose run --rm phpunit
+```
+
+To check code style:
+
+```bash
+docker compose run --rm php composer run checkstyle
+```
+
+To fix code style issues:
+
+```bash
+docker compose run --rm fixcs
+```
+
+To run static analysis:
+
+```bash
+docker compose run --rm phpstan
 ```
 
 To open a terminal in the dev environment:
-``` bash
-$ make debug
+
+```bash
+docker compose run --rm php sh
 ```
 
 License

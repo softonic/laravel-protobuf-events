@@ -7,15 +7,17 @@ use Exception;
 use Mockery;
 use Orchestra\Testbench\TestCase;
 use Override;
+
 use function PHPUnit\Framework\assertSame;
 use function PHPUnit\Framework\assertTrue;
+
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Softonic\LaravelProtobufEvents\Exceptions\InvalidMessageException;
 use Softonic\LaravelProtobufEvents\FakeProto\FakeMessage;
 
-function publish($routingKey, $message): void
+function publish($routingKey, array $message): void
 {
     assertSame(':service:.softonic.laravel_protobuf_events.fake_proto.fake_message', $routingKey);
 
@@ -124,7 +126,7 @@ class ExternalEventsTest extends TestCase
                     'data'    => '{"content":":content:"}',
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
-                $this->isType('int'),
+                Mockery::type('int'),
                 null
             )
             ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
@@ -146,7 +148,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithoutClientItShouldThrowAnException(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function handle(FakeMessage $message): void
             {
                 assertSame(':content:', $message->getContent());
@@ -175,7 +177,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingANonValidListenerItShouldThrowAnException(): void
     {
-        $invalidListener = new class() {
+        $invalidListener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -209,7 +211,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithoutHeadersItShouldExecuteIt(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -238,7 +240,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithSetHeadersMethodButWithoutSendingHeadersItShouldExecuteIt(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -272,7 +274,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithHeadersItShouldExecuteIt(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -307,7 +309,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithLoggerAndFormatterItShouldExecuteAndLogIt(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -337,7 +339,7 @@ class ExternalEventsTest extends TestCase
                     'data'    => $message->serializeToJsonString(),
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
                 ],
-                $this->isType('int'),
+                Mockery::type('int'),
                 null
             )
             ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
@@ -368,7 +370,7 @@ class ExternalEventsTest extends TestCase
     #[Test]
     public function whenDecoratingAListenerWithLoggerAndFormatterButListenerThrowsAnExceptionItShouldLogItAndThrowTheException(): void
     {
-        $listener = new class() {
+        $listener = new class () {
             public function setClient(string $client): void
             {
                 assertSame(':client:', $client);
@@ -399,8 +401,8 @@ class ExternalEventsTest extends TestCase
                     'headers' => ['xRequestId' => '7b15d663-8d55-4e2f-82cc-4473576a4a17'],
 
                 ],
-                $this->isType('int'),
-                $this->isInstanceOf(Exception::class)
+                Mockery::type('int'),
+                Mockery::type(Exception::class)
             )
             ->andReturn(new LogMessage(':message:', ['context' => ':context:']));
 

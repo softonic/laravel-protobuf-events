@@ -1,0 +1,12 @@
+parameters:
+	level: 7
+	paths:
+		- src
+	ignoreErrors:
+		- '#Variable \$startTimeMs might not be defined#'
+		- '#Variable \$response might not be defined#'
+		- '#Parameter .* \$executionTimeMs .* expects int, float given#'
+		- '#Cannot call method .* on class-string\|object#'
+		- '#Call to an undefined method ReflectionType::getName\(\)#'
+		- '#Call to an undefined method object::mergeFromJsonString\(\)#'
+		- '#has parameter .* with no value type specified in iterable type array#'
