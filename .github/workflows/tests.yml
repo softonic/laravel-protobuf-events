@@ -35,7 +35,9 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
         env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+          # The ephemeral workflow token: unauthenticated runners share IPs and
+          # hit the GitHub API rate limit on cache-miss installs.
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
 
       - name: Execute tests
         run: composer run phpunit

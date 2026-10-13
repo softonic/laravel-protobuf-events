@@ -14,7 +14,7 @@
     "ext-pcntl": "*",
     "ext-bcmath": "*",
     "ext-sockets": "*",
-    "google/protobuf": "^3.19",
+    "google/protobuf": "^3.19 || ^4.33.6",
     "illuminate/support": "^12.0",
     "nuwber/rabbitevents": "^8.0"
   },
